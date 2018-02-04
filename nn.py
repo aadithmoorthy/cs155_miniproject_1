@@ -10,8 +10,13 @@ import matplotlib.pyplot as plt
 from keras.optimizers import RMSprop
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 from utils import *
+from sklearn.preprocessing import StandardScaler
+
 
 Xtr, ytr, Xts, yts = get_split_data()
+trunc = 500
+Xtr = Xtr[:,:trunc] #truncation
+Xts = Xts[:,:trunc] #truncation
 print ('loaded data')
 
 
@@ -34,16 +39,11 @@ model.fit(Xtr, ytr, batch_size=50, validation_data=(Xts, yts), epochs=100, verbo
 
 fit_model = True
 if fit_model:
-    # sequential model # 0.857 with this arch at 4 epochs (use without preprocessing) - saved in nn_model1.h5 (scored 0.852 in leaderboard!)
     model = Sequential()
-    model.add(Dense(2048, input_shape=(len(Xtr[0,:]),)))
+    model.add(Dense(trunc, input_shape=(len(Xtr[0,:]),)))
     model.add(BatchNormalization())
     model.add(Activation('relu'))
-    model.add(Dropout(0.9))
-    model.add(Dense(1024))
-    model.add(BatchNormalization())
-    model.add(Activation('relu'))
-    model.add(Dropout(0.9))
+    model.add(Dropout(0.8))
     model.add(Dense(1))
     model.add(Activation('sigmoid'))
 

@@ -31,15 +31,19 @@ result = np.concatenate((result_col_1,result_col_2), axis = 1)
 np.savetxt('merge_result.txt', result, fmt="%d", delimiter=',', header='Id,Prediction')
 '''
 # also try averaging with leaderboard scores!
-scores = [0.85120,0.85180]
+scores = [0.85420,0.85180, 0.84800, 0.82400, 0.82780, 0.83320]
 sum_scores = np.sum(scores)
 merge = np.zeros((test_num,1))
-merge += (0.85120/sum_scores) * np.loadtxt('logistic_linear_result_probabilities.txt').reshape((test_num,1))
-merge += (0.85180/sum_scores) * np.loadtxt('nn_result_probabilities.txt').reshape((test_num,1))
-merge += (-/sum_scores) * np.loadtxt('naive_bayes_result_probabilities.txt').reshape((test_num,1))
+merge += (0.85420/sum_scores) * np.loadtxt('logistic_linear_result.txt', skiprows=1, usecols=(1), delimiter=",").reshape((test_num,1))
+merge += (0.85180/sum_scores) * np.loadtxt('nn_result.txt', skiprows=1, usecols=(1), delimiter=",").reshape((test_num,1))
+merge += (0.84800/sum_scores) * np.loadtxt('gbdt_result.txt', skiprows=1, usecols=(1), delimiter=",").reshape((test_num,1))
+merge += (0.82400/sum_scores) * np.loadtxt('naive_bayes_result.txt', skiprows=1, usecols=(1), delimiter=",").reshape((test_num,1))
+merge += (0.82780/sum_scores) * np.loadtxt('rf_result.txt', skiprows=1, usecols=(1), delimiter=",").reshape((test_num,1))
+merge += (0.83320/sum_scores) * np.loadtxt('adaboost_result.txt', skiprows=1, usecols=(1), delimiter=",").reshape((test_num,1))
 result_col_2 = merge
 print(merge, sum_scores)
 result_col_2 = result_col_2.reshape((len(result_col_2),1))
 result_col_1 = (np.array(range(len(result_col_2)))+1).reshape((len(result_col_2),1))
 result = np.concatenate((result_col_1,result_col_2), axis = 1)
-np.savetxt('merge_result.txt', np.round(result), fmt="%d", delimiter=',', header='Id,Prediction')
+np.savetxt('merge_result.txt', np.round(result), fmt="%d", delimiter=',', header='Id,Prediction', comments='')
+print(np.sum(np.round(result)[:,1]))
