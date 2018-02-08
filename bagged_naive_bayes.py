@@ -1,28 +1,16 @@
-# naive bayes
-
+# bagged naive bayes
+from sklearn.ensemble import BaggingClassifier
 from sklearn.naive_bayes import GaussianNB, MultinomialNB
 from sklearn.linear_model import LogisticRegression
-from scipy.sparse import coo_matrix
 from utils import *
 import numpy as np
-from tqdm import tqdm
-Xtr, ytr, Xts, yts = get_split_data()
-'''Xtr_temp = np.zeros((19000,500*499/2+500))
-Xts_temp = np.zeros((1000,500*499/2+500))
-currIdx = 0
-for i in tqdm(range(500)):
-    for j in range(i, 500):
-        Xtr_temp[:,currIdx] = np.minimum(Xtr[:,i], Xtr[:,j])
-        Xts_temp[:,currIdx] = np.minimum(Xts[:,i], Xts[:,j])
-        currIdx += 1
 
-Xtr = Xtr_temp
-Xts = Xts_temp'''
+Xtr, ytr, Xts, yts = get_split_data()
 #scale.fit(Xtr)
 #Xtr = scale.transform(Xtr)
 #Xts = scale.transform(Xts)
 print ('loaded data')
-mdl = MultinomialNB(alpha=0)
+mdl = BaggingClassifier(MultinomialNB(alpha=0),  verbose=1, n_jobs=-1, max_features=1.0)
 mdl.fit(Xtr, ytr)
 
 print (mdl.score(Xtr, ytr))
