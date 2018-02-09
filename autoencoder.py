@@ -6,10 +6,10 @@ from keras.models import Model, Sequential
 
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.optimizers import RMSprop
-from utils import get_split_data
+from utils import *
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
-
+import numpy as np
 Xtr, ytr, Xts, yts = get_split_data()
 
 train = False
@@ -41,7 +41,7 @@ else:
     # test with logistic regression as bench mark:
     autoencoder_decoder = load_model('autoencoder.hdf5')
     autoencoder = Model(inputs=autoencoder_decoder.input, outputs=autoencoder_decoder.layers[2].output)
-    Xtr_transform = autoencoder.predict(Xtr, batch_size=50)
+    '''Xtr_transform = autoencoder.predict(Xtr, batch_size=50)
     Xts_transform = autoencoder.predict(Xts, batch_size=50)
     print autoencoder_decoder.predict(Xtr, batch_size=50)
     print Xtr
@@ -57,7 +57,15 @@ else:
     model.add(Dense(1))
     model.add(Activation('sigmoid'))
 
-    #checkpoint = ModelCheckpoint('nn_model.hdf5', monitor='val_acc', save_best_only=True, mode='max')
+    checkpoint = ModelCheckpoint('autoencoded_nn_model.hdf5', monitor='val_acc', save_best_only=True, mode='max')
     stop = EarlyStopping(monitor='val_acc', patience=10, mode='max')
     model.compile(loss='binary_crossentropy',optimizer='rmsprop', metrics=['accuracy'])
-    model.fit(Xtr_transform, ytr, batch_size=50, validation_data=(Xts_transform, yts), epochs=100, verbose=1, callbacks=[stop])
+    model.fit(Xtr_transform, ytr, batch_size=50, validation_data=(Xts_transform, yts), epochs=100, verbose=1, callbacks=[checkpoint, stop])
+    '''
+    model = load_model('autoencoded_nn_model.hdf5')
+    result_col_2 = model.predict(autoencoder.predict(get_test_data(), batch_size=50))
+
+    result_col_2 = result_col_2.reshape((len(result_col_2),1))
+    result_col_1 = (np.array(range(len(result_col_2)))+1).reshape((len(result_col_2),1))
+    result = np.concatenate((result_col_1,result_col_2), axis = 1)
+    np.savetxt('autoencoded_nn_result.txt', np.round(result), fmt="%d", delimiter=',', header='Id,Prediction', comments="")
